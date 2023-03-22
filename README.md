@@ -1,4 +1,4 @@
-# semgrep-haskell;
+# semgrep-haskell
 
 Generated Haskell parser code for semgrep.
 
