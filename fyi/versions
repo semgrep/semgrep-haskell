@@ -1,0 +1,30 @@
+File: semgrep-grammars/src/tree-sitter-haskell/LICENSE
+Git repo name: tree-sitter-haskell
+Latest commit in repo: 0da7f826e85b3e589e217adf69a6fd89ee4301b9
+Last change in file:
+  commit 04c56a25500d7cc3b0bbe8323c9e1a7bf26ba953
+  Author: Rick Winfrey <rewinfrey@github.com>
+  Date:   Fri Dec 1 16:35:48 2017 -0800
+  
+      Add LICENSE
+---
+File: semgrep-grammars/src/tree-sitter-haskell/grammar.js
+Git repo name: tree-sitter-haskell
+Latest commit in repo: 0da7f826e85b3e589e217adf69a6fd89ee4301b9
+Last change in file:
+  commit 0da7f826e85b3e589e217adf69a6fd89ee4301b9
+  Author: Brandon Wu <49291449+brandonspark@users.noreply.github.com>
+  Date:   Wed Mar 1 16:13:13 2023 -0800
+  
+      explicitly inline hidden rule (#96)
+---
+File: semgrep-grammars/src/semgrep-haskell/grammar.js
+Git repo name: ocaml-tree-sitter-semgrep
+Latest commit in repo: 4977c7ec89616d7ad97341eb0602fbc8670d1d59
+Last change in file:
+  commit c04ef584442a45493a59e07821ef6fabf7b5bd39
+  Author: brandonspark <wu.brandonj@gmail.com>
+  Date:   Wed Jan 25 14:06:09 2023 -0800
+  
+      try again
+---
