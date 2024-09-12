@@ -20,11 +20,11 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-haskell/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 4977c7ec89616d7ad97341eb0602fbc8670d1d59
+Latest commit in repo: 1a167cfef687a3745d513a3b00a85f16d047c2a0
 Last change in file:
-  commit c04ef584442a45493a59e07821ef6fabf7b5bd39
+  commit afcb9deba3b29abeba1b40b5a16dfb2c53d7208f
   Author: brandonspark <wu.brandonj@gmail.com>
-  Date:   Wed Jan 25 14:06:09 2023 -0800
+  Date:   Wed Mar 22 16:05:27 2023 -0700
   
-      try again
+      feat: add metavariables
 ---

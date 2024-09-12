@@ -1,7 +1,9 @@
+; required to install tree_sitter/parser.h
+(include_subdirs qualified)
+
 (library
   (public_name tree-sitter-lang.haskell)
   (name tree_sitter_haskell)
-  (preprocess (pps ppx_sexp_conv))
   (libraries atdgen-runtime tree-sitter.run)
 
   ; A copy of the C headers for the tree-sitter library is found locally.
@@ -38,6 +40,7 @@
     (language cxx)
     (names )
     (flags -fPIC
+           -I %{env:TREESITTER_INCDIR=/usr/local/include}
            -I .)
   )
 )

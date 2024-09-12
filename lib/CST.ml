@@ -15,16 +15,20 @@ type namespace = [
   | `Type of Token.t (* "type" *)
 ]
 
-type splice_dollar = Token.t
+type where = Token.t
 
-type type_star = [
-    `STAR of Token.t (* "*" *)
-  | `UNKUNKUNK of Token.t (* "\226\152\133" *)
+type type_role = [
+    `Repr of Token.t (* "representational" *)
+  | `Nomi of Token.t (* "nominal" *)
+  | `Phan of Token.t (* "phantom" *)
+  | `X__ of Token.t (* "_" *)
 ]
 
 type do_keyword = [ `Mdo of Token.t (* "mdo" *) | `Do of Token.t (* "do" *) ]
 
 type layout_start = Token.t
+
+type splice_dollar = Token.t
 
 type quasiquote_start = Token.t
 
@@ -46,9 +50,10 @@ type conid = Token.t (* pattern "[\\p{Lu}\\p{Lt}](\\w|')*#?" *)
 
 type con_list = (Token.t (* "[" *) * Token.t (* "]" *))
 
-type unboxed_close = Token.t
-
-type strict = Token.t
+type type_star = [
+    `STAR of Token.t (* "*" *)
+  | `UNKUNKUNK of Token.t (* "\226\152\133" *)
+]
 
 type imm_tok_at = Token.t (* "@" *)
 
@@ -68,6 +73,8 @@ type binary_literal = Token.t
 
 type char = Token.t
 
+type unboxed_close = Token.t
+
 type colon2 = [
     `UNKUNKUNK of Token.t (* "\226\136\183" *)
   | `COLONCOLON of Token.t (* "::" *)
@@ -81,16 +88,14 @@ type deriving_strategy = [
   | `Anyc of Token.t (* "anyclass" *)
 ]
 
+type unboxed_open = [
+    `LPARHASHSPACE of Token.t (* "(# " *)
+  | `LPARHASHLF of Token.t (* "(#\n" *)
+]
+
 type quasiquote_bar = Token.t
 
 type empty_file = Token.t
-
-type type_role = [
-    `Repr of Token.t (* "representational" *)
-  | `Nomi of Token.t (* "nominal" *)
-  | `Phan of Token.t (* "phantom" *)
-  | `X__ of Token.t (* "_" *)
-]
 
 type safety = [
     `Unsafe of Token.t (* "unsafe" *)
@@ -98,32 +103,29 @@ type safety = [
   | `Inte of Token.t (* "interruptible" *)
 ]
 
-type varsym = Token.t
+type varid = Token.t (* pattern "[_\\p{Ll}](\\w|')*#?" *)
 
 type quasiquote_body = Token.t
-
-type varid = Token.t (* pattern "[_\\p{Ll}](\\w|')*#?" *)
 
 type implicit_parid = Token.t (* pattern "\\?[_\\p{Ll}](\\w|')*" *)
 
 type dot = Token.t
 
-type octal_literal = Token.t
-
 type string_ = Token.t
 
-type tok_barrbrack = Token.t
+type octal_literal = Token.t
 
-type unboxed_open = [
-    `LPARHASHSPACE of Token.t (* "(# " *)
-  | `LPARHASHLF of Token.t (* "(#\n" *)
-]
+type strict = Token.t
 
 type label = Token.t (* pattern "#[_\\p{Ll}](\\w|')*" *)
 
+type semgrep_metavariable = Token.t
+
 type layout_end = Token.t
 
-type where = Token.t
+type tok_barrbrack = Token.t
+
+type varsym = Token.t
 
 type calling_convention = [
     `Ccall of Token.t (* "ccall" *)
@@ -135,11 +137,11 @@ type calling_convention = [
   | `Capi of Token.t (* "capi" *)
 ]
 
-type tyconsym = Token.t
-
 type hex_literal = Token.t
 
 type consym = Token.t
+
+type tyconsym = Token.t
 
 type con_tuple = (
     Token.t (* "(" *)
@@ -152,6 +154,11 @@ type forall_dot = [ `DOT of Token.t (* "." *) | `Arrow of arrow ]
 type anon_choice_SEMI_ab17175 = [
     `SEMI of Token.t (* ";" *)
   | `Layout_semi of layout_semicolon (*tok*)
+]
+
+type constructor = [
+    `Conid of conid (*tok*)
+  | `Semg_meta of semgrep_metavariable (*tok*)
 ]
 
 type foreign_pre = (calling_convention * safety option)
@@ -169,14 +176,17 @@ type gcon_literal = [
   | `Con_tuple of con_tuple
 ]
 
-type operator_minus = [ `Op of varsym (*tok*) | `Minus of Token.t (* "-" *) ]
-
 type tyfam_injectivity = (
     Token.t (* "|" *)
   * varid (*tok*)
   * arrow
   * varid (*tok*) list (* one or more *)
 )
+
+type variable = [
+    `Varid of varid (*tok*)
+  | `Semg_meta of semgrep_metavariable (*tok*)
+]
 
 type fundep = (
     varid (*tok*) list (* one or more *)
@@ -186,43 +196,17 @@ type fundep = (
 
 type stringly = [ `Str of string_ (*tok*) | `Char of char (*tok*) ]
 
+type modid = constructor
+
+type tyconid = constructor
+
+type operator_minus = [ `Op of varsym (*tok*) | `Minus of Token.t (* "-" *) ]
+
 type number = [ `Int of integer | `Float of float_ (*tok*) ]
 
 type type_operator = [
     `Tyco of tyconsym (*tok*)
   | `Cons_op of consym (*tok*)
-]
-
-type qualifying_module = (conid (*tok*) * dot (*tok*)) list (* one or more *)
-
-type ticked_tycon = (Token.t (* "`" *) * conid (*tok*) * Token.t (* "`" *))
-
-type con = [
-    `Cons of conid (*tok*)
-  | `LPAR_cons_op_RPAR of (
-        Token.t (* "(" *) * consym (*tok*) * Token.t (* ")" *)
-    )
-]
-
-type varop = [
-    `Choice_op of operator_minus
-  | `BQUOT_var_BQUOT of (
-        Token.t (* "`" *) * varid (*tok*) * Token.t (* "`" *)
-    )
-]
-
-type var = [
-    `Var of varid (*tok*)
-  | `LPAR_choice_op_RPAR of (
-        Token.t (* "(" *) * operator_minus * Token.t (* ")" *)
-    )
-]
-
-type pat_name = [
-    `Var of varid (*tok*)
-  | `LPAR_choice_op_RPAR of (
-        Token.t (* "(" *) * operator_minus * Token.t (* ")" *)
-    )
 ]
 
 type fundeps = (
@@ -231,10 +215,33 @@ type fundeps = (
   * (comma (*tok*) * fundep) list (* zero or more *)
 )
 
+type qualifying_module = (modid * dot (*tok*)) list (* one or more *)
+
+type ticked_tycon = (Token.t (* "`" *) * tyconid * Token.t (* "`" *))
+
+type con = [
+    `Cons of tyconid
+  | `LPAR_cons_op_RPAR of (
+        Token.t (* "(" *) * consym (*tok*) * Token.t (* ")" *)
+    )
+]
+
+type varop = [
+    `Choice_op of operator_minus
+  | `BQUOT_var_BQUOT of (Token.t (* "`" *) * variable * Token.t (* "`" *))
+]
+
+type pat_name = [
+    `Var of variable
+  | `LPAR_choice_op_RPAR of (
+        Token.t (* "(" *) * operator_minus * Token.t (* ")" *)
+    )
+]
+
 type literal = [ `Choice_str of stringly | `Choice_int of number ]
 
 type simple_tycon = [
-    `Cons of conid (*tok*)
+    `Cons of tyconid
   | `LPAR_type_op_RPAR of (
         Token.t (* "(" *) * type_operator * Token.t (* ")" *)
     )
@@ -256,12 +263,12 @@ type simple_tyconop = [
   | `Type_op of type_operator
 ]
 
-type name = [ `Choice_var of var | `Choice_cons of con ]
+type name = [ `Choice_var of pat_name | `Choice_cons of con ]
 
-type import_name = [ `Choice_cons of con | `Choice_var of var ]
+type import_name = [ `Choice_cons of con | `Choice_var of pat_name ]
 
 type fun_name = [
-    `Choice_var of var
+    `Choice_var of pat_name
   | `Impl_parid of implicit_parid (*tok*)
 ]
 
@@ -275,8 +282,8 @@ type type_literal = [
 ]
 
 type qmodid = [
-    `Qual_module of (qualifying_module * conid (*tok*))
-  | `Modid of conid (*tok*)
+    `Qual_module of (qualifying_module * modid)
+  | `Modid of modid
 ]
 
 type qconsym = [
@@ -285,13 +292,13 @@ type qconsym = [
 ]
 
 type qvarid = [
-    `Qual_var of (qualifying_module * varid (*tok*))
-  | `Var of varid (*tok*)
+    `Qual_var of (qualifying_module * variable)
+  | `Var of variable
 ]
 
 type qtyconid = [
-    `Qual_type of (qualifying_module * conid (*tok*))
-  | `Cons of conid (*tok*)
+    `Qual_type of (qualifying_module * tyconid)
+  | `Cons of tyconid
 ]
 
 type qvarsym = [
@@ -310,8 +317,8 @@ type qualified_type_operator_ = [
 ]
 
 type qconid = [
-    `Qual_cons of (qualifying_module * conid (*tok*))
-  | `Cons of conid (*tok*)
+    `Qual_cons of (qualifying_module * tyconid)
+  | `Cons of tyconid
 ]
 
 type op = [ `Varop of varop | `Choice_cons_op of conop ]
@@ -399,7 +406,7 @@ type qcon = [
 type import_item = (
     namespace option
   * [
-        `Choice_var of var
+        `Choice_var of pat_name
       | `Choice_cons_opt_import_con_names of (
             simple_tycon
           * import_con_names option
@@ -621,7 +628,7 @@ and anon_stmt_rep_choice_SEMI_stmt_opt_choice_SEMI_a6f3eb1 = (
 
 and apat = [
     `Pat_name of pat_name
-  | `Pat_as of (varid (*tok*) * imm_tok_at (*tok*) * apat)
+  | `Pat_as of (variable * imm_tok_at (*tok*) * apat)
   | `Pat_cons of pat_constructor
   | `Pat_record of (pat_constructor * pat_fields)
   | `Lit_ of literal_
@@ -912,8 +919,8 @@ and qual = [
 ]
 
 and signature = (
-    var
-  * (comma (*tok*) * var) list (* zero or more *)
+    pat_name
+  * (comma (*tok*) * pat_name) list (* zero or more *)
   * type_annotation
 )
 
@@ -999,17 +1006,17 @@ and tyvar = [
 
 type pattern_equals = (pat * Token.t (* "=" *) * pat)
 
-type strict_type = (strict (*tok*) * atype)
-
-type via = (Token.t (* "via" *) * type_)
-
 type forall_ = (forall * forall_dot)
 
 type pattern_type = (con * type_annotation)
 
-type pattern_decl = (pat * funrhs)
-
 type tyfam_result_type = (Token.t (* "=" *) * tyvar)
+
+type via = (Token.t (* "via" *) * type_)
+
+type strict_type = (strict (*tok*) * atype)
+
+type pattern_decl = (pat * funrhs)
 
 type inst_tyinst = (
     Token.t (* "type" *)
@@ -1019,17 +1026,32 @@ type inst_tyinst = (
   * type_
 )
 
-type anon_choice_strict_type_5770e7f = [
-    `Strict_type of strict_type
-  | `Type_infix of type_infix
+type simpletype = [
+    `LPAR_simp_RPAR of (Token.t (* "(" *) * tyfam_head * Token.t (* ")" *))
+  | `Simp_infix of (tyvar * simple_tyconop * tyvar)
+  | `Choice_cons_rep_choice_anno_type_var of (
+        simple_tycon
+      * tyvar list (* zero or more *)
+    )
 ]
 
-type field = (
-    varid (*tok*)
-  * (comma (*tok*) * varid (*tok*)) list (* zero or more *)
-  * colon2
-  * [ `Strict_type of strict_type | `Type of type_ ]
+and tyfam_head = simpletype
+
+type instance = (
+    Token.t (* "instance" *)
+  * forall_ option
+  * context_ option
+  * constraint_
 )
+
+type datainst = (
+    forall_ option
+  * context_ option
+  * type_infix
+  * type_annotation option
+)
+
+type tyfam_inj = (tyfam_result_type * tyfam_injectivity option)
 
 type deriving = (
     Token.t (* "deriving" *)
@@ -1049,35 +1071,17 @@ type deriving = (
   * via option
 )
 
-type instance = (
-    Token.t (* "instance" *)
-  * forall_ option
-  * context_ option
-  * constraint_
-)
-
-type datainst = (
-    forall_ option
-  * context_ option
-  * type_infix
-  * type_annotation option
-)
-
-type simpletype = [
-    `LPAR_simp_RPAR of (Token.t (* "(" *) * tyfam_head * Token.t (* ")" *))
-  | `Simp_infix of (tyvar * simple_tyconop * tyvar)
-  | `Choice_cons_rep_choice_anno_type_var of (
-        simple_tycon
-      * tyvar list (* zero or more *)
-    )
+type anon_choice_strict_type_5770e7f = [
+    `Strict_type of strict_type
+  | `Type_infix of type_infix
 ]
 
-and tyfam_head = simpletype
-
-type tyfam_pat = [
-    `Choice_qual_type_rep_atype of (qtyconid * atype list (* zero or more *))
-  | `Btype_qtyc_btype of (btype * qtyconop * btype)
-]
+type field = (
+    variable
+  * (comma (*tok*) * variable) list (* zero or more *)
+  * colon2
+  * [ `Strict_type of strict_type | `Type of type_ ]
+)
 
 type pattern_arrow = (
     pat
@@ -1113,7 +1117,10 @@ type pattern_arrow = (
       option
 )
 
-type tyfam_inj = (tyfam_result_type * tyfam_injectivity option)
+type tyfam_pat = [
+    `Choice_qual_type_rep_atype of (qtyconid * atype list (* zero or more *))
+  | `Btype_qtyc_btype of (btype * qtyconop * btype)
+]
 
 type decl_foreign = [
     `Decl_fore_import of (
@@ -1132,6 +1139,11 @@ type decl_foreign = [
     )
 ]
 
+type context_newtype = [
+    `Cont__simp of (context_ * tyfam_head)
+  | `Simp of tyfam_head
+]
+
 type gadt_sig = [
     `Gadt_fun of (anon_choice_strict_type_5770e7f * arrow * gadt_sig)
   | `Choice_strict_type of anon_choice_strict_type_5770e7f
@@ -1146,27 +1158,7 @@ type record_fields = (
 
 type record_field = (Token.t (* "{" *) * field * Token.t (* "}" *))
 
-type context_newtype = [
-    `Cont__simp of (context_ * tyfam_head)
-  | `Simp of tyfam_head
-]
-
 type tyfam_eq = (tyfam_pat * Token.t (* "=" *) * type_or_implicit)
-
-type gadt_constr_type = (
-    colon2
-  * forall_ option
-  * context_ option
-  * [
-        `Gadt_sig of gadt_sig
-      | `Record_fields_arrow_gadt_sig of (record_fields * arrow * gadt_sig)
-    ]
-)
-
-type newtype_constructor = (
-    conid (*tok*)
-  * [ `Atype of atype | `Record_field of record_field ]
-)
 
 type cdecl = [
     `Gend of gendecl
@@ -1187,23 +1179,19 @@ type cdecl = [
     )
 ]
 
-type anon_choice_data_cons_3ed9ff3 = [
-    `Data_cons of (
-        conid (*tok*)
-      * [ `Strict_type of strict_type | `Atype of atype ]
-          list (* zero or more *)
-    )
-  | `Data_cons_infix of (
-        anon_choice_strict_type_5770e7f * conop
-      * anon_choice_strict_type_5770e7f
-    )
-  | `Data_cons_record of (conid (*tok*) * record_fields)
-]
+type gadt_constr_type = (
+    colon2
+  * forall_ option
+  * context_ option
+  * [
+        `Gadt_sig of gadt_sig
+      | `Record_fields_arrow_gadt_sig of (record_fields * arrow * gadt_sig)
+    ]
+)
 
-type newtype = (
-    Token.t (* "=" *)
-  * newtype_constructor
-  * deriving list (* zero or more *)
+type newtype_constructor = (
+    tyconid
+  * [ `Atype of atype | `Record_field of record_field ]
 )
 
 type class_body = (
@@ -1228,6 +1216,25 @@ type class_body = (
         )
     ]
       option
+)
+
+type anon_choice_data_cons_3ed9ff3 = [
+    `Data_cons of (
+        tyconid
+      * [ `Strict_type of strict_type | `Atype of atype ]
+          list (* zero or more *)
+    )
+  | `Data_cons_infix of (
+        anon_choice_strict_type_5770e7f * conop
+      * anon_choice_strict_type_5770e7f
+    )
+  | `Data_cons_record of (tyconid * record_fields)
+]
+
+type newtype = (
+    Token.t (* "=" *)
+  * newtype_constructor
+  * deriving list (* zero or more *)
 )
 
 type constructors = (
@@ -1518,41 +1525,40 @@ type comment (* inlined *) = Token.t
 
 type pragma (* inlined *) = Token.t
 
+type semgrep_ellipsis (* inlined *) = Token.t (* "..." *)
+
 type tycon_arrow (* inlined *) = (
     Token.t (* "(" *) * arrow * Token.t (* ")" *)
 )
 
-type constructor (* inlined *) = conid (*tok*)
-
-type operator (* inlined *) = varsym (*tok*)
-
 type type_variable (* inlined *) = varid (*tok*)
-
-type variable (* inlined *) = varid (*tok*)
 
 type expent (* inlined *) = string_ (*tok*)
 
 type impent (* inlined *) = string_ (*tok*)
 
+type operator (* inlined *) = varsym (*tok*)
+
 type constructor_operator (* inlined *) = consym (*tok*)
 
-type modid (* inlined *) = conid (*tok*)
+type var (* inlined *) = [
+    `Var of variable
+  | `LPAR_choice_op_RPAR of (
+        Token.t (* "(" *) * operator_minus * Token.t (* ")" *)
+    )
+]
 
-type tyconid (* inlined *) = conid (*tok*)
+type qualified_module (* inlined *) = (qualifying_module * modid)
 
-type qualified_module (* inlined *) = (qualifying_module * conid (*tok*))
+type qualified_variable (* inlined *) = (qualifying_module * variable)
 
-type qualified_variable (* inlined *) = (qualifying_module * varid (*tok*))
-
-type qualified_type (* inlined *) = (qualifying_module * conid (*tok*))
+type qualified_type (* inlined *) = (qualifying_module * tyconid)
 
 type qualified_type_operator (* inlined *) = (
     qualifying_module * tyconsym (*tok*)
 )
 
-type qualified_constructor (* inlined *) = (
-    qualifying_module * conid (*tok*)
-)
+type qualified_constructor (* inlined *) = (qualifying_module * tyconid)
 
 type ticked_qtycon (* inlined *) = (
     Token.t (* "`" *) * qtyconid * Token.t (* "`" *)
@@ -1693,7 +1699,7 @@ type funvar (* inlined *) = (fun_name * fun_patterns option)
 
 type pat_apply (* inlined *) = (pat_constructor * fun_patterns)
 
-type pat_as (* inlined *) = (varid (*tok*) * imm_tok_at (*tok*) * apat)
+type pat_as (* inlined *) = (variable * imm_tok_at (*tok*) * apat)
 
 type pat_infix (* inlined *) = (lpat * qconop * pat)
 
@@ -1790,7 +1796,12 @@ type type_unboxed_tuple (* inlined *) = (
   * unboxed_close (*tok*)
 )
 
-type tyfam_pat_infix (* inlined *) = (btype * qtyconop * btype)
+type tyfam_pat_prefix (* inlined *) = (
+    qtyconid
+  * atype list (* zero or more *)
+)
+
+type simpletype_infix (* inlined *) = (tyvar * simple_tyconop * tyvar)
 
 type decl_tyinst (* inlined *) = (
     Token.t (* "type" *)
@@ -1808,13 +1819,6 @@ type decl_default (* inlined *) = (
   * Token.t (* ")" *)
 )
 
-type simpletype_infix (* inlined *) = (tyvar * simple_tyconop * tyvar)
-
-type tyfam_pat_prefix (* inlined *) = (
-    qtyconid
-  * atype list (* zero or more *)
-)
-
 type default_signature (* inlined *) = (Token.t (* "default" *) * signature)
 
 type quantifiers (* inlined *) = (forall * forall_dot)
@@ -1827,6 +1831,8 @@ type decl_foreign_import (* inlined *) = (
   * signature
 )
 
+type tyfam_pat_infix (* inlined *) = (btype * qtyconop * btype)
+
 type decl_foreign_export (* inlined *) = (
     Token.t (* "foreign" *)
   * Token.t (* "export" *)
@@ -1836,22 +1842,8 @@ type decl_foreign_export (* inlined *) = (
 )
 
 type data_constructor (* inlined *) = (
-    conid (*tok*)
+    tyconid
   * [ `Strict_type of strict_type | `Atype of atype ] list (* zero or more *)
-)
-
-type gadt_fun (* inlined *) = (
-    anon_choice_strict_type_5770e7f * arrow * gadt_sig
-)
-
-type data_constructor_infix (* inlined *) = (
-    anon_choice_strict_type_5770e7f * conop * anon_choice_strict_type_5770e7f
-)
-
-type decl_deriving (* inlined *) = (
-    Token.t (* "deriving" *)
-  * [ `Deri_stra of deriving_strategy | `Via of via ] option
-  * instance
 )
 
 type decl_type (* inlined *) = (
@@ -1884,6 +1876,20 @@ type decl_datafam (* inlined *) = (
   * type_annotation option
 )
 
+type decl_deriving (* inlined *) = (
+    Token.t (* "deriving" *)
+  * [ `Deri_stra of deriving_strategy | `Via of via ] option
+  * instance
+)
+
+type gadt_fun (* inlined *) = (
+    anon_choice_strict_type_5770e7f * arrow * gadt_sig
+)
+
+type data_constructor_infix (* inlined *) = (
+    anon_choice_strict_type_5770e7f * conop * anon_choice_strict_type_5770e7f
+)
+
 type decl_pattern (* inlined *) = (
     Token.t (* "pattern" *)
   * [
@@ -1893,7 +1899,7 @@ type decl_pattern (* inlined *) = (
     ]
 )
 
-type data_constructor_record (* inlined *) = (conid (*tok*) * record_fields)
+type data_constructor_record (* inlined *) = (tyconid * record_fields)
 
 type decl_tyfam (* inlined *) = (
     Token.t (* "type" *)
