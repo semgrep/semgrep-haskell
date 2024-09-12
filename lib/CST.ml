@@ -2013,3 +2013,11 @@ type module_ (* inlined *) = (
     ]
       option
 )
+
+type extra = 
+    Cpp of Loc.t * cpp
+  | Comment of Loc.t * comment
+  | Pragma of Loc.t * pragma
+
+
+type extras = extra list

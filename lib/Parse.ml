@@ -65,6 +65,7 @@ let children_regexps : (string * Run.exp option) list = [
     |];
   );
   "binary_literal", None;
+  "comment", None;
   "hex_literal", None;
   "splice_dollar", None;
   "colon2",
@@ -144,6 +145,7 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal "=>");
     |];
   );
+  "cpp", None;
   "safety",
   Some (
     Alt [|
@@ -171,6 +173,7 @@ let children_regexps : (string * Run.exp option) list = [
   "layout_start", None;
   "pat_wildcard", None;
   "label", None;
+  "pragma", None;
   "layout_end", None;
   "integer_literal", None;
   "forall_kw",
@@ -3678,6 +3681,10 @@ let trans_binary_literal ((kind, body) : mt) : CST.binary_literal =
   | Leaf v -> v
   | Children _ -> assert false
 
+let trans_comment ((kind, body) : mt) : CST.comment =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
 
 let trans_hex_literal ((kind, body) : mt) : CST.hex_literal =
   match body with
@@ -3916,6 +3923,10 @@ let trans_carrow ((kind, body) : mt) : CST.carrow =
       )
   | Leaf _ -> assert false
 
+let trans_cpp ((kind, body) : mt) : CST.cpp =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
 
 let trans_safety ((kind, body) : mt) : CST.safety =
   match body with
@@ -4009,6 +4020,10 @@ let trans_label ((kind, body) : mt) : CST.label =
   | Leaf v -> v
   | Children _ -> assert false
 
+let trans_pragma ((kind, body) : mt) : CST.pragma =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
 
 let trans_layout_end ((kind, body) : mt) : CST.layout_end =
   match body with
@@ -11698,14 +11713,57 @@ let trans_haskell ((kind, body) : mt) : CST.haskell =
       )
   | Leaf _ -> assert false
 
+(*
+   Costly operation that translates a whole tree or subtree.
+
+   The first pass translates it into a generic tree structure suitable
+   to guess which node corresponds to each grammar rule.
+   The second pass is a translation into a typed tree where each grammar
+   node has its own type.
+
+   This function is called:
+   - once on the root of the program after removing extras
+     (comments and other nodes that occur anywhere independently from
+     the grammar);
+   - once of each extra node, resulting in its own independent tree of type
+     'extra'.
+*)
+let translate_tree src node trans_x =
+  let matched_tree = Run.match_tree children_regexps src node in
+  Option.map trans_x matched_tree
+
+
+let translate_extra src (node : Tree_sitter_output_t.node) : CST.extra option =
+  match node.type_ with
+  | "cpp" ->
+      (match translate_tree src node trans_cpp with
+      | None -> None
+      | Some x -> Some (Cpp (Run.get_loc node, x)))
+  | "comment" ->
+      (match translate_tree src node trans_comment with
+      | None -> None
+      | Some x -> Some (Comment (Run.get_loc node, x)))
+  | "pragma" ->
+      (match translate_tree src node trans_pragma with
+      | None -> None
+      | Some x -> Some (Pragma (Run.get_loc node, x)))
+  | _ -> None
+
+let translate_root src root_node =
+  translate_tree src root_node trans_haskell
+
 let parse_input_tree input_tree =
   let orig_root_node = Tree_sitter_parsing.root input_tree in
   let src = Tree_sitter_parsing.src input_tree in
   let errors = Run.extract_errors src orig_root_node in
-  let root_node = Run.remove_extras ~extras orig_root_node in
-  let matched_tree = Run.match_tree children_regexps src root_node in
-  let opt_program = Option.map trans_haskell matched_tree in
-  Parsing_result.create src opt_program errors
+  let opt_program, extras =
+     Run.translate
+       ~extras
+       ~translate_root:(translate_root src)
+       ~translate_extra:(translate_extra src)
+       orig_root_node
+  in
+  Parsing_result.create src opt_program extras errors
 
 let string ?src_file contents =
   let input_tree = parse_source_string ?src_file contents in
