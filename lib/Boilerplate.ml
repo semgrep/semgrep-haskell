@@ -3850,9 +3850,9 @@ let dump_tree root =
 
 let map_extra (env : env) (x : CST.extra) =
   match x with
-  | Cpp (_loc, x) -> ("cpp", "cpp", map_cpp env x)
-  | Comment (_loc, x) -> ("comment", "comment", map_comment env x)
-  | Pragma (_loc, x) -> ("pragma", "pragma", map_pragma env x)
+  | `Cpp (_loc, x) -> ("cpp", "cpp", map_cpp env x)
+  | `Comment (_loc, x) -> ("comment", "comment", map_comment env x)
+  | `Pragma (_loc, x) -> ("pragma", "pragma", map_pragma env x)
 
 let dump_extras (extras : CST.extras) =
   List.iter (fun extra ->

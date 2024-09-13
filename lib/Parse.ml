@@ -11738,15 +11738,15 @@ let translate_extra src (node : Tree_sitter_output_t.node) : CST.extra option =
   | "cpp" ->
       (match translate_tree src node trans_cpp with
       | None -> None
-      | Some x -> Some (Cpp (Run.get_loc node, x)))
+      | Some x -> Some (`Cpp (Run.get_loc node, x)))
   | "comment" ->
       (match translate_tree src node trans_comment with
       | None -> None
-      | Some x -> Some (Comment (Run.get_loc node, x)))
+      | Some x -> Some (`Comment (Run.get_loc node, x)))
   | "pragma" ->
       (match translate_tree src node trans_pragma with
       | None -> None
-      | Some x -> Some (Pragma (Run.get_loc node, x)))
+      | Some x -> Some (`Pragma (Run.get_loc node, x)))
   | _ -> None
 
 let translate_root src root_node =
